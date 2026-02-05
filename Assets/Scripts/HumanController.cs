@@ -1,0 +1,60 @@
+using UnityEngine;
+
+public class HumanController : MonoBehaviour
+{
+    private Vector2 _moveInput = Vector2.zero;
+
+    [Header("Movement")]
+    [SerializeField]
+    private float movementSpeed = 5f;
+    [SerializeField]
+    private float acceleration = 25f;
+
+    private float _currentVelocityX;
+    
+    void Start()
+    {
+        if (InputManager.Instance != null)
+        {
+            Subscribe();
+        }
+    }
+
+    void OnEnable()
+    {
+        if (InputManager.Instance != null)
+        {
+            Subscribe();
+        }
+    }
+
+    void OnDisable()
+    {
+        if (InputManager.Instance != null)
+        {
+            Unsubscribe();
+        }
+    }
+
+    private void Subscribe()
+    {
+        InputManager.Instance.OnMove += OnMove;
+    }
+
+    private void Unsubscribe()
+    {
+        InputManager.Instance.OnMove -= OnMove;
+    }
+
+    private void OnMove(Vector2 value)
+    {
+        _moveInput = value;
+    }
+
+    void Update()
+    {
+        float targetSpeed = _moveInput.x * movementSpeed;
+        _currentVelocityX = Mathf.MoveTowards(_currentVelocityX, targetSpeed, acceleration * Time.deltaTime);
+        transform.Translate(_currentVelocityX * Time.deltaTime, 0f, 0f);
+    }
+}
