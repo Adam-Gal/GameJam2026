@@ -20,6 +20,7 @@ public class InputManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        
         _input = new PlayerInput();
     }
 
