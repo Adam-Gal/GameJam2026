@@ -1,1 +1,3 @@
 # GameJam2026
+
+Téma: TU PRAVIDLÁ NEPLATIA
