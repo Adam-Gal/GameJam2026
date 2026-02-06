@@ -51,12 +51,45 @@ public class FrogController : MonoBehaviour
         StartFrogSound();
     }
 
-    void OnEnable() => SubscribeInput();
-    void OnDisable() => UnsubscribeInput();
+    void OnEnable()
+    {
+        SubscribeInput();
+    }
+
+    void OnDisable()
+    {
+        UnsubscribeInput();
+
+        if (mainCamera != null)
+        {
+            mainCamera.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+        }
+
+        transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+
+        if (_frogSoundCoroutine != null)
+        {
+            StopCoroutine(_frogSoundCoroutine);
+            _frogSoundCoroutine = null;
+        }
+
+        if (_frogAudio != null && _frogAudio.isPlaying)
+        {
+            _frogAudio.Stop();
+        }
+    }
+
+    void OnDestroy()
+    {
+        UnsubscribeInput();
+    }
 
     private void SubscribeInput()
     {
-        if (InputManager.Instance == null) return;
+        if (InputManager.Instance == null)
+        {
+            return;
+        }
 
         InputManager.Instance.OnMove += HandleOnMove;
         InputManager.Instance.OnUse += HandleOnUse;
@@ -64,7 +97,10 @@ public class FrogController : MonoBehaviour
 
     private void UnsubscribeInput()
     {
-        if (InputManager.Instance == null) return;
+        if (InputManager.Instance == null)
+        {
+            return;
+        }
 
         InputManager.Instance.OnMove -= HandleOnMove;
         InputManager.Instance.OnUse -= HandleOnUse;
@@ -72,20 +108,48 @@ public class FrogController : MonoBehaviour
 
     private void HandleOnMove(Vector2 value)
     {
-        if (!IsCurrentCharacter()) return;
+        if (this == null)
+        {
+            UnsubscribeInput();
+            return;
+        }
+
+        if (!IsCurrentCharacter())
+        {
+            return;
+        }
+
         OnMove(value);
     }
 
     private void HandleOnUse(bool value)
     {
-        if (!IsCurrentCharacter()) return;
+        if (this == null)
+        {
+            UnsubscribeInput();
+            return;
+        }
+
+        if (!IsCurrentCharacter())
+        {
+            return;
+        }
+
         OnUse(value);
     }
 
     private bool IsCurrentCharacter()
     {
-        return CharacterManagerController.Instance != null &&
-               CharacterManagerController.Instance.CurrentCharacterGameObject == gameObject;
+        if (CharacterManagerController.Instance == null)
+        {
+            return false;
+        }
+        GameObject current = CharacterManagerController.Instance.CurrentCharacterGameObject;
+        if (current == null)
+        {
+            return false;
+        }
+        return current == gameObject;
     }
 
     private void OnMove(Vector2 value)
@@ -93,13 +157,22 @@ public class FrogController : MonoBehaviour
         _animator.SetBool("Move", Mathf.Abs(value.x) > DEADZONE);
         _moveInput = value;
 
-        if (value.x < 0f) _spriteRenderer.flipX = false;
-        else if (value.x > 0f) _spriteRenderer.flipX = true;
+        if (value.x < 0f)
+        {
+            _spriteRenderer.flipX = false;
+        }
+        else if (value.x > 0f)
+        {
+            _spriteRenderer.flipX = true;
+        }
     }
 
     private void OnUse(bool value)
     {
-        if (!value || Time.time < _nextFlipTime) return;
+        if (!value || Time.time < _nextFlipTime)
+        {
+            return;
+        }
 
         _using = !_using;
         transform.rotation = Quaternion.Euler(0, 0, _using ? 180f : 0f);
@@ -111,7 +184,10 @@ public class FrogController : MonoBehaviour
 
     private void Movement()
     {
-        if (!_onGround) return;
+        if (!_onGround)
+        {
+            return;
+        }
 
         bool hasSideInput = Mathf.Abs(_moveInput.x) > DEADZONE;
         if (!hasSideInput)
@@ -170,12 +246,22 @@ public class FrogController : MonoBehaviour
         Movement();
     }
 
-    private void OnCollisionEnter2D(Collision2D other) => _onGround = true;
-    private void OnCollisionExit2D(Collision2D other) => _onGround = false;
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        _onGround = true;
+    }
+
+    private void OnCollisionExit2D(Collision2D other)
+    {
+        _onGround = false;
+    }
 
     private void StartFrogSound()
     {
-        if (_frogAudio == null || _frogSoundCoroutine != null) return;
+        if (_frogAudio == null || _frogSoundCoroutine != null)
+        {
+            return;
+        }
         _frogSoundCoroutine = StartCoroutine(FrogSoundLoop());
     }
 
