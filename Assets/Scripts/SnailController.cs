@@ -10,13 +10,21 @@ public class SnailController : MonoBehaviour
     [SerializeField] private float acceleration = 25f;
 
     [Header("Sprint Settings")]
+    [SerializeField] private float chargeDuration = 1f;
     [SerializeField] private float sprintDuration = 0.5f;
     [SerializeField] private float cooldown = 10f;
 
     private float _currentVelocityX;
+
+    private bool _isCharging;
+    private bool _charged;
     private bool _isSprinting;
+
+    private float _chargeEndTime;
     private float _sprintEndTime;
     private float _cooldownEndTime;
+
+    private float _sprintDirection;
 
     void Start()
     {
@@ -51,27 +59,73 @@ public class SnailController : MonoBehaviour
     private void OnMove(Vector2 value)
     {
         _moveInput = value;
+
+        if (_charged && !_isSprinting)
+        {
+            if (value.x > 0.1f)
+                StartSprint(1f);
+            else if (value.x < -0.1f)
+                StartSprint(-1f);
+        }
     }
 
     private void OnSprint(bool value)
     {
-        if (value && Time.time >= _cooldownEndTime)
+        if (value && !_isCharging && !_charged && !_isSprinting && Time.time >= _cooldownEndTime)
         {
-            _isSprinting = true;
-            _sprintEndTime = Time.time + sprintDuration;
-            _cooldownEndTime = Time.time + cooldown;
+            _isCharging = true;
+            _chargeEndTime = Time.time + chargeDuration;
         }
+    }
+
+    private void StartSprint(float direction)
+    {
+        _charged = false;
+        _isSprinting = true;
+        _sprintDirection = direction;
+        _sprintEndTime = Time.time + sprintDuration;
     }
 
     void Update()
     {
+        if (_isCharging && Time.time >= _chargeEndTime)
+        {
+            _isCharging = false;
+
+            if (Mathf.Abs(_moveInput.x) > 0.1f)
+            {
+                StartSprint(Mathf.Sign(_moveInput.x));
+            }
+            else
+            {
+                _charged = true;
+            }
+        }
+
+
         if (_isSprinting && Time.time >= _sprintEndTime)
         {
             _isSprinting = false;
+            _cooldownEndTime = Time.time + cooldown;
         }
 
-        float targetSpeed = _moveInput.x * ( _isSprinting ? sprintSpeed : movementSpeed );
-        _currentVelocityX = Mathf.MoveTowards(_currentVelocityX, targetSpeed, acceleration * Time.deltaTime);
+        float targetSpeed;
+
+        if (_isSprinting)
+        {
+            targetSpeed = _sprintDirection * sprintSpeed;
+        }
+        else
+        {
+            targetSpeed = _moveInput.x * movementSpeed;
+        }
+
+        _currentVelocityX = Mathf.MoveTowards(
+            _currentVelocityX,
+            targetSpeed,
+            acceleration * Time.deltaTime
+        );
+
         transform.Translate(_currentVelocityX * Time.deltaTime, 0f, 0f);
     }
 }
