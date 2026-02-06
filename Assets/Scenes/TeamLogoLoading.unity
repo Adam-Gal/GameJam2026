@@ -494,10 +494,10 @@ MonoBehaviour:
   roarClip: {fileID: 8300000, guid: e5fd20e2461dec046a16b5a26826fdbf, type: 3}
   audioStartDelay: 3
   imageToRotate: {fileID: 452217057}
-  roar1StartDelay: 3.25
+  roar1StartDelay: 2.9
   roar1RotationZ: -15
   roar1RotationDuration: 1
-  roar2StartDelay: 4.5
+  roar2StartDelay: 3.25
   roar2RotationZ: -10
   roar2RotationDuration: 0.25
 --- !u!225 &1347950737
