@@ -28,6 +28,12 @@ public class SnailController : MonoBehaviour
     
     private SpriteRenderer _spriteRenderer;
     private Animator _animator;
+    
+    private void Awake()
+    {
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _animator = GetComponent<Animator>();
+    }
 
     void Start()
     {
