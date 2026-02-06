@@ -11,19 +11,106 @@ public class CharacterManagerController : MonoBehaviour
     [Header("Camera")]
     [SerializeField] private CameraFollower cameraFollower;
 
+    private bool _subscribed;
+
     void Start()
     {
         SetActiveCharacter(currentCharacter);
+        Subscribe();
+    }
+
+    void OnEnable()
+    {
+        Subscribe();
+    }
+
+    void OnDisable()
+    {
+        Unsubscribe();
+    }
+
+    void OnDestroy()
+    {
+        Unsubscribe();
+    }
+
+    private void Subscribe()
+    {
+        if (_subscribed)
+        {
+            return;
+        }
+
+        if (InputManager.Instance == null)
+        {
+            return;
+        }
+        InputManager.Instance.OnOne += HandleOne;
+        InputManager.Instance.OnTwo += HandleTwo;
+        InputManager.Instance.OnThree += HandleThree;
+        _subscribed = true;
+    }
+
+    private void Unsubscribe()
+    {
+        if (!_subscribed)
+        {
+            return;
+        }
+        if (InputManager.Instance != null)
+        {
+            InputManager.Instance.OnOne -= HandleOne;
+            InputManager.Instance.OnTwo -= HandleTwo;
+            InputManager.Instance.OnThree -= HandleThree;
+        }
+        _subscribed = false;
+    }
+
+    private void HandleOne(bool pressed)
+    {
+        if (!pressed)
+        {
+            return;
+        }
+
+        if (unlockedCharacters >= 1)
+        {
+            SwitchCharacter(0);
+        }
+    }
+
+    private void HandleTwo(bool pressed)
+    {
+        if (!pressed)
+        {
+            return;
+        }
+
+        if (unlockedCharacters >= 2)
+        {
+            SwitchCharacter(1);
+        }
+    }
+
+    private void HandleThree(bool pressed)
+    {
+        if (!pressed)
+        {
+            return;
+        }
+
+        if (unlockedCharacters >= 3)
+        {
+            SwitchCharacter(2);
+        }
     }
 
     void Update()
     {
-        if (Keyboard.current.digit1Key.wasPressedThisFrame && unlockedCharacters >= 1) SwitchCharacter(0);
-        if (Keyboard.current.digit2Key.wasPressedThisFrame && unlockedCharacters >= 2) SwitchCharacter(1);
-        if (Keyboard.current.digit3Key.wasPressedThisFrame && unlockedCharacters >= 3) SwitchCharacter(2);
-
         if (Keyboard.current.tabKey.wasPressedThisFrame)
+        {
             SwitchCharacter((currentCharacter + 1) % characterArray.Length);
+        }
     }
 
     public void SwitchCharacter(int newIndex)
@@ -36,11 +123,9 @@ public class CharacterManagerController : MonoBehaviour
 
         if (!oldChar || !newChar) return;
 
-        // uloženie pozície
         Vector3 savedPos = oldChar.transform.position;
-        Quaternion savedRot = oldChar.transform.rotation;
+        Quaternion savedRot = Quaternion.identity;
 
-        // === OLD CHARACTER ===
         Rigidbody oldRb = oldChar.GetComponent<Rigidbody>();
         if (oldRb)
         {
@@ -51,7 +136,6 @@ public class CharacterManagerController : MonoBehaviour
 
         oldChar.SetActive(false);
 
-        // === NEW CHARACTER ===
         newChar.transform.SetPositionAndRotation(savedPos, savedRot);
         newChar.SetActive(true);
 
@@ -63,25 +147,31 @@ public class CharacterManagerController : MonoBehaviour
             newRb.angularVelocity = Vector3.zero;
         }
 
-        // === CAMERA ===
         if (cameraFollower)
-            cameraFollower.SetTarget(newChar.transform, true); // instant snap pri switchi
+            cameraFollower.SetTarget(newChar.transform, true);
 
         currentCharacter = newIndex;
     }
 
+
     private void SetActiveCharacter(int index)
     {
         for (int i = 0; i < characterArray.Length; i++)
+        {
             if (characterArray[i])
+            {
                 characterArray[i].SetActive(false);
+            }
+        }
 
         if (characterArray[index])
         {
             characterArray[index].SetActive(true);
 
             if (cameraFollower)
+            {
                 cameraFollower.SetTarget(characterArray[index].transform, true);
+            }
         }
 
         currentCharacter = index;

@@ -11,6 +11,9 @@ public class InputManager : MonoBehaviour
     public event Action<Vector2> OnMove;
     public event Action<bool> OnSprint;
     public event Action<bool> OnUse;
+    public event Action<bool> OnOne;
+    public event Action<bool> OnTwo;
+    public event Action<bool> OnThree;
 
     private void Awake()
     {
@@ -68,6 +71,12 @@ public class InputManager : MonoBehaviour
         _input.Player.Sprint.canceled  += OnSprintCancelled;
         _input.Player.Use.performed += OnUsePerformed;
         _input.Player.Use.canceled += OnUseCancelled;
+        _input.Player.One.performed += OnOnePerformed;
+        _input.Player.One.canceled += OnOneCancelled;
+        _input.Player.Two.performed += OnTwoPerformed;
+        _input.Player.Two.canceled += OnTwoCancelled;
+        _input.Player.Three.performed += OnThreePerformed;
+        _input.Player.Three.canceled += OnThreeCancelled;
     }
 
     private void Unsubscribe()
@@ -83,6 +92,12 @@ public class InputManager : MonoBehaviour
         _input.Player.Sprint.canceled  -= OnSprintCancelled;
         _input.Player.Use.performed -= OnUsePerformed;
         _input.Player.Use.canceled -= OnUseCancelled;
+        _input.Player.One.performed -= OnOnePerformed;
+        _input.Player.One.canceled -= OnOneCancelled;
+        _input.Player.Two.performed -= OnTwoPerformed;
+        _input.Player.Two.canceled -= OnTwoCancelled;
+        _input.Player.Three.performed -= OnThreePerformed;
+        _input.Player.Three.canceled -= OnThreeCancelled;
     }
 
     private void OnMovePerformed(InputAction.CallbackContext context)
@@ -113,6 +128,36 @@ public class InputManager : MonoBehaviour
     private void OnUseCancelled(InputAction.CallbackContext context)
     {
         OnUse?.Invoke(false);
+    }
+    
+    private void OnOnePerformed(InputAction.CallbackContext context)
+    {
+        OnOne?.Invoke(context.ReadValueAsButton());
+    }
+
+    private void OnOneCancelled(InputAction.CallbackContext context)
+    {
+        OnOne?.Invoke(false);
+    }
+    
+    private void OnTwoPerformed(InputAction.CallbackContext context)
+    {
+        OnTwo?.Invoke(context.ReadValueAsButton());
+    }
+
+    private void OnTwoCancelled(InputAction.CallbackContext context)
+    {
+        OnTwo?.Invoke(false);
+    }
+    
+    private void OnThreePerformed(InputAction.CallbackContext context)
+    {
+        OnThree?.Invoke(context.ReadValueAsButton());
+    }
+
+    private void OnThreeCancelled(InputAction.CallbackContext context)
+    {
+        OnThree?.Invoke(false);
     }
 
     private void OnDestroy()

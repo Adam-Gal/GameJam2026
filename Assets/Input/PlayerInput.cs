@@ -118,6 +118,33 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""One"",
+                    ""type"": ""Button"",
+                    ""id"": ""76e39b03-a77d-4687-ba6d-250703499a3a"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Two"",
+                    ""type"": ""Button"",
+                    ""id"": ""8c352c15-1d89-4e3d-9123-b192494ba1a4"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Three"",
+                    ""type"": ""Button"",
+                    ""id"": ""cb69a8f3-3650-4c29-8684-1f9a6a7113ed"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -241,6 +268,39 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""Use"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""309d83c5-1754-4cd8-ae91-89d467bdce4b"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""One"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a94b2f09-8985-4624-8f8f-528c2b5e8949"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Two"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c76de882-c8b5-4e93-b936-be3b23cb2627"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Three"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -252,6 +312,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_Use = m_Player.FindAction("Use", throwIfNotFound: true);
+        m_Player_One = m_Player.FindAction("One", throwIfNotFound: true);
+        m_Player_Two = m_Player.FindAction("Two", throwIfNotFound: true);
+        m_Player_Three = m_Player.FindAction("Three", throwIfNotFound: true);
     }
 
     ~@PlayerInput()
@@ -335,6 +398,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_Use;
+    private readonly InputAction m_Player_One;
+    private readonly InputAction m_Player_Two;
+    private readonly InputAction m_Player_Three;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -358,6 +424,18 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Use".
         /// </summary>
         public InputAction @Use => m_Wrapper.m_Player_Use;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/One".
+        /// </summary>
+        public InputAction @One => m_Wrapper.m_Player_One;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Two".
+        /// </summary>
+        public InputAction @Two => m_Wrapper.m_Player_Two;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Three".
+        /// </summary>
+        public InputAction @Three => m_Wrapper.m_Player_Three;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -393,6 +471,15 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Use.started += instance.OnUse;
             @Use.performed += instance.OnUse;
             @Use.canceled += instance.OnUse;
+            @One.started += instance.OnOne;
+            @One.performed += instance.OnOne;
+            @One.canceled += instance.OnOne;
+            @Two.started += instance.OnTwo;
+            @Two.performed += instance.OnTwo;
+            @Two.canceled += instance.OnTwo;
+            @Three.started += instance.OnThree;
+            @Three.performed += instance.OnThree;
+            @Three.canceled += instance.OnThree;
         }
 
         /// <summary>
@@ -413,6 +500,15 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @Use.started -= instance.OnUse;
             @Use.performed -= instance.OnUse;
             @Use.canceled -= instance.OnUse;
+            @One.started -= instance.OnOne;
+            @One.performed -= instance.OnOne;
+            @One.canceled -= instance.OnOne;
+            @Two.started -= instance.OnTwo;
+            @Two.performed -= instance.OnTwo;
+            @Two.canceled -= instance.OnTwo;
+            @Three.started -= instance.OnThree;
+            @Three.performed -= instance.OnThree;
+            @Three.canceled -= instance.OnThree;
         }
 
         /// <summary>
@@ -474,5 +570,26 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnUse(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "One" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnOne(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Two" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnTwo(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Three" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnThree(InputAction.CallbackContext context);
     }
 }
