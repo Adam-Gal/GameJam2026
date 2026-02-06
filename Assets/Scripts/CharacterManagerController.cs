@@ -28,9 +28,20 @@ public class CharacterManagerController : MonoBehaviour
         Subscribe();
     }
 
-    void OnEnable() => Subscribe();
-    void OnDisable() => Unsubscribe();
-    void OnDestroy() => Unsubscribe();
+    void OnEnable()
+    {
+        Subscribe();
+    }
+
+    void OnDisable()
+    {
+        Unsubscribe();
+    }
+
+    void OnDestroy()
+    {
+        Unsubscribe();
+    }
 
     private void Subscribe()
     {
@@ -84,17 +95,25 @@ public class CharacterManagerController : MonoBehaviour
 
     public void SwitchCharacter(int newIndex)
     {
-        if (newIndex == currentCharacter) return;
-        if (newIndex < 0 || newIndex >= characterArray.Length) return;
+        if (newIndex == currentCharacter)
+        {
+            return;
+        }
+        if (newIndex < 0 || newIndex >= characterArray.Length)
+        {
+            return;
+        }
 
         GameObject oldChar = characterArray[currentCharacter];
         GameObject newChar = characterArray[newIndex];
-        if (!oldChar || !newChar) return;
+        if (!oldChar || !newChar)
+        {
+            return;
+        }
 
         Vector3 savedPos = oldChar.transform.position;
-        Quaternion savedRot = oldChar.transform.rotation;
+        Quaternion savedRot = Quaternion.identity;
 
-        // deaktivuje starý charakter a jeho Rigidbody
         Rigidbody2D oldRb2D = oldChar.GetComponent<Rigidbody2D>();
         if (oldRb2D != null)
         {
@@ -105,7 +124,6 @@ public class CharacterManagerController : MonoBehaviour
 
         oldChar.SetActive(false);
 
-        // aktivuje nový charakter
         newChar.transform.SetPositionAndRotation(savedPos, savedRot);
         newChar.SetActive(true);
 
@@ -124,7 +142,6 @@ public class CharacterManagerController : MonoBehaviour
 
     private void SetActiveCharacter(int index)
     {
-        // deaktivuje všetky charaktery
         for (int i = 0; i < characterArray.Length; i++)
         {
             if (characterArray[i])
@@ -135,7 +152,6 @@ public class CharacterManagerController : MonoBehaviour
             }
         }
 
-        // aktivuje len aktuálny
         GameObject activeChar = characterArray[index];
         if (activeChar)
         {
