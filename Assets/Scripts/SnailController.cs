@@ -28,41 +28,58 @@ public class SnailController : MonoBehaviour
     
     private SpriteRenderer _spriteRenderer;
     private Animator _animator;
-    
-    private void Awake()
-    {
-        _spriteRenderer = GetComponent<SpriteRenderer>();
-        _animator = GetComponent<Animator>();
-    }
+    private bool _subscribed;
 
     void Start()
     {
         if (InputManager.Instance != null)
+        {
             Subscribe();
+        }
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _animator = GetComponent<Animator>();
     }
 
     void OnEnable()
     {
         if (InputManager.Instance != null)
+        {
             Subscribe();
+        }
     }
 
     void OnDisable()
     {
         if (InputManager.Instance != null)
+        {
             Unsubscribe();
+        }
+    }
+
+    void OnDestroy()
+    {
+        if (InputManager.Instance != null)
+        {
+            Unsubscribe();
+        }
     }
 
     private void Subscribe()
     {
+        if (_subscribed) return;
+        if (InputManager.Instance == null) return;
         InputManager.Instance.OnMove += OnMove;
         InputManager.Instance.OnSprint += OnSprint;
+        _subscribed = true;
     }
 
     private void Unsubscribe()
     {
+        if (!_subscribed) return;
+        if (InputManager.Instance == null) return;
         InputManager.Instance.OnMove -= OnMove;
         InputManager.Instance.OnSprint -= OnSprint;
+        _subscribed = false;
     }
 
     private void OnMove(Vector2 value)

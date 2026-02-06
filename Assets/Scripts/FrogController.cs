@@ -26,46 +26,71 @@ public class FrogController : MonoBehaviour
     [SerializeField] private float waitDuration = 0.65f;
 
     private float _sideTimer;
-    private float _hopLockTimer;
     private float _nextHopAllowedTime;
     private bool _isSideMoving;
     private bool _hadSideInput;
     
     private SpriteRenderer _spriteRenderer;
     private Animator _animator;
-    
-    private void Awake()
-    {
-        _spriteRenderer = GetComponent<SpriteRenderer>();
-        _animator = GetComponent<Animator>();
-    }
+    private const float DEADZONE = 0.1f;
 
     void Start()
     {
-        if (InputManager.Instance != null) Subscribe();
         _rigidbody2D = GetComponent<Rigidbody2D>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _animator = GetComponent<Animator>();
+        if (InputManager.Instance != null)
+        {
+            Subscribe();
+        }
     }
 
     void OnEnable()
     {
-        if (InputManager.Instance != null) Subscribe();
+        if (InputManager.Instance != null)
+        {
+            Subscribe();
+        }
     }
 
     void OnDisable()
     {
-        if (InputManager.Instance != null) Unsubscribe();
+        if (InputManager.Instance != null)
+        {
+            Unsubscribe();
+        }
+    }
+
+    void OnDestroy()
+    {
+        if (InputManager.Instance != null)
+        {
+            Unsubscribe();
+        }
     }
 
     private void Subscribe()
     {
-        InputManager.Instance.OnMove += OnMove;
-        InputManager.Instance.OnUse += OnUse;
+        InputManager.Instance.OnMove += HandleOnMove;
+        InputManager.Instance.OnUse += HandleOnUse;
     }
 
     private void Unsubscribe()
     {
-        InputManager.Instance.OnMove -= OnMove;
-        InputManager.Instance.OnUse -= OnUse;
+        InputManager.Instance.OnMove -= HandleOnMove;
+        InputManager.Instance.OnUse -= HandleOnUse;
+    }
+
+    private void HandleOnMove(Vector2 value)
+    {
+        if (this == null) return;
+        OnMove(value);
+    }
+
+    private void HandleOnUse(bool value)
+    {
+        if (this == null) return;
+        OnUse(value);
     }
 
     private void OnMove(Vector2 value)
@@ -106,9 +131,8 @@ public class FrogController : MonoBehaviour
         if (!_onGround)
             return;
 
-        bool hasSideInput = Mathf.Abs(_moveInput.x) > 0.1f;
+        bool hasSideInput = Mathf.Abs(_moveInput.x) > DEADZONE;
 
-        // No input → stop everything
         if (!hasSideInput)
         {
             _currentVelocityX = 0f;
@@ -118,18 +142,14 @@ public class FrogController : MonoBehaviour
             return;
         }
 
-        // Start hop cycle immediately on first press (but not spammable)
         if (!_hadSideInput && Time.time >= _nextHopAllowedTime)
         {
             _isSideMoving = true;
             _sideTimer = 0f;
             _hadSideInput = true;
-
-            // Prevent tap-spamming from restarting the cycle
             _nextHopAllowedTime = Time.time + moveDuration + waitDuration;
         }
 
-        // If cycle hasn't started yet, do nothing
         if (!_hadSideInput)
             return;
 
@@ -137,7 +157,6 @@ public class FrogController : MonoBehaviour
 
         if (_isSideMoving)
         {
-            // MOVE phase
             if (_sideTimer >= moveDuration)
             {
                 _sideTimer = 0f;
@@ -152,11 +171,10 @@ public class FrogController : MonoBehaviour
         }
         else
         {
-            // WAIT phase
             if (_sideTimer >= waitDuration)
             {
                 _sideTimer = 0f;
-                _isSideMoving = true; // 🔁 loop hop
+                _isSideMoving = true;
             }
         }
     }

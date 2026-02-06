@@ -7,6 +7,7 @@ public class InputManager : MonoBehaviour
     public static InputManager Instance { get; private set; }
 
     private PlayerInput _input;
+
     public event Action<Vector2> OnMove;
     public event Action<bool> OnSprint;
     public event Action<bool> OnUse;
@@ -24,30 +25,43 @@ public class InputManager : MonoBehaviour
             return;
         }
 
-        _input = new PlayerInput();
-        Subscribe();
-        _input.Player.Enable();
+        if (_input == null)
+        {
+            _input = new PlayerInput();
+        }
     }
 
     private void OnEnable()
     {
-        if (Instance == this)
+        if (Instance != this)
         {
-            _input?.Player.Enable();
-            Subscribe();
+            return;
         }
+        if (_input == null) _input = new PlayerInput();
+
+        Unsubscribe();
+        Subscribe();
+
+        _input.Player.Enable();
     }
 
     private void OnDisable()
     {
+        if (Instance != this)
+        {
+            return;
+        }
         Unsubscribe();
         _input?.Player.Disable();
     }
 
     private void Subscribe()
     {
-        if (_input == null) return;
-        
+        if (_input == null)
+        {
+            return;
+        }
+
         _input.Player.Move.performed += OnMovePerformed;
         _input.Player.Move.canceled  += OnMoveCanceled;
         _input.Player.Sprint.performed += OnSprintPerformed;
@@ -58,8 +72,11 @@ public class InputManager : MonoBehaviour
 
     private void Unsubscribe()
     {
-        if (_input == null) return;
-        
+        if (_input == null)
+        {
+            return;
+        }
+
         _input.Player.Move.performed -= OnMovePerformed;
         _input.Player.Move.canceled  -= OnMoveCanceled;
         _input.Player.Sprint.performed -= OnSprintPerformed;
@@ -87,7 +104,7 @@ public class InputManager : MonoBehaviour
     {
         OnSprint?.Invoke(false);
     }
-    
+
     private void OnUsePerformed(InputAction.CallbackContext context)
     {
         OnUse?.Invoke(context.ReadValueAsButton());
@@ -104,5 +121,8 @@ public class InputManager : MonoBehaviour
         {
             Instance = null;
         }
+        Unsubscribe();
+        _input?.Dispose();
+        _input = null;
     }
 }

@@ -15,13 +15,7 @@ public class HumanController : MonoBehaviour
     private SpriteRenderer _spriteRenderer;
     private Animator _animator;
     private AudioSource _footstepAudio;
-
-    private void Awake()
-    {
-        _spriteRenderer = GetComponent<SpriteRenderer>();
-        _animator = GetComponent<Animator>();
-        _footstepAudio = GetComponent<AudioSource>();
-    }
+    private bool _subscribed;
 
     void Start()
     {
@@ -29,6 +23,9 @@ public class HumanController : MonoBehaviour
         {
             Subscribe();
         }
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _animator = GetComponent<Animator>();
+        _footstepAudio = GetComponent<AudioSource>();
     }
 
     void OnEnable()
@@ -47,14 +44,28 @@ public class HumanController : MonoBehaviour
         }
     }
 
+    void OnDestroy()
+    {
+        if (InputManager.Instance != null)
+        {
+            Unsubscribe();
+        }
+    }
+
     private void Subscribe()
     {
+        if (_subscribed) return;
+        if (InputManager.Instance == null) return;
         InputManager.Instance.OnMove += OnMove;
+        _subscribed = true;
     }
 
     private void Unsubscribe()
     {
+        if (!_subscribed) return;
+        if (InputManager.Instance == null) return;
         InputManager.Instance.OnMove -= OnMove;
+        _subscribed = false;
     }
 
     private void OnMove(Vector2 value)
