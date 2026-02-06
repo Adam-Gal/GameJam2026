@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class FrogController : MonoBehaviour
@@ -24,7 +25,12 @@ public class FrogController : MonoBehaviour
     [Header("Side Movement Timing")]
     [SerializeField] private float moveDuration = 0.25f;
     [SerializeField] private float waitDuration = 0.65f;
+    
+    [Header("Frog Audio")]
+    [SerializeField] private float soundPauseTime = 2f;
 
+    private AudioSource _frogAudio;
+    private Coroutine _frogSoundCoroutine;
     private float _sideTimer;
     private float _nextHopAllowedTime;
     private bool _isSideMoving;
@@ -39,10 +45,13 @@ public class FrogController : MonoBehaviour
         _rigidbody2D = GetComponent<Rigidbody2D>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _animator = GetComponent<Animator>();
+        _frogAudio = GetComponent<AudioSource>();
+        
         if (InputManager.Instance != null)
         {
             Subscribe();
         }
+        StartFrogSound();
     }
 
     void OnEnable()
@@ -58,6 +67,16 @@ public class FrogController : MonoBehaviour
         if (InputManager.Instance != null)
         {
             Unsubscribe();
+        }
+        if (_frogSoundCoroutine != null)
+        {
+            StopCoroutine(_frogSoundCoroutine);
+            _frogSoundCoroutine = null;
+        }
+
+        if (_frogAudio != null && _frogAudio.isPlaying)
+        {
+            _frogAudio.Stop();
         }
     }
 
@@ -200,5 +219,24 @@ public class FrogController : MonoBehaviour
     private void OnCollisionExit2D(Collision2D other)
     {
         _onGround = false;
+    }
+    
+    private void StartFrogSound()
+    {
+        if (_frogAudio == null || _frogSoundCoroutine != null)
+            return;
+
+        _frogSoundCoroutine = StartCoroutine(FrogSoundLoop());
+    }
+
+    private IEnumerator FrogSoundLoop()
+    {
+        while (true)
+        {
+            _frogAudio.pitch = UnityEngine.Random.Range(0.95f, 1.05f);
+            _frogAudio.Play();
+            yield return new WaitForSeconds(_frogAudio.clip.length);
+            yield return new WaitForSeconds(soundPauseTime);
+        }
     }
 }
