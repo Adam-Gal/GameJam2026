@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class FrogController : MonoBehaviour
 {
@@ -286,6 +287,22 @@ public class FrogController : MonoBehaviour
             _frogAudio.pitch = Random.Range(0.95f, 1.05f);
             _frogAudio.Play();
             yield return new WaitForSeconds(_frogAudio.clip.length + soundPauseTime);
+        }
+    }
+    
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("End1"))
+        {
+            SceneManager.LoadScene("List 2");
+        }
+        if (other.gameObject.CompareTag("End2"))
+        {
+            SceneManager.LoadScene("List 3");
+        }
+        if (other.gameObject.CompareTag("End3"))
+        {
+            SceneManager.LoadScene("List 4");
         }
     }
 }

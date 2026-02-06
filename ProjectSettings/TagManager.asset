@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Collectible
   - Bed
+  - End1
+  - End2
+  - End3
   layers:
   - Default
   - TransparentFX
