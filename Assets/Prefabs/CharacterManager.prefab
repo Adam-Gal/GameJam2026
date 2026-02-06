@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2972750648984253006}
   m_Layer: 0
   m_Name: CharacterManager
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -48,13 +48,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e44da15f0850c9428bc777361a2a88b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterController
-  currentCharacter: 0
   characterArray:
   - {fileID: 8501581276242556243}
   - {fileID: 6972532457212080848}
   - {fileID: 7430694988488325261}
   - {fileID: 4652318464587759501}
-  target: {fileID: 0}
+  currentCharacter: 0
+  unlockedCharacters: 1
+  cameraFollower: {fileID: 0}
 --- !u!1001 &351914914437009330
 PrefabInstance:
   m_ObjectHideFlags: 0
