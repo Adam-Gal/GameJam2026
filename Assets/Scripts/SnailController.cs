@@ -14,6 +14,10 @@ public class SnailController : MonoBehaviour
     [SerializeField] private float sprintDuration = 0.5f;
     [SerializeField] private float cooldown = 10f;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource moveAudio;
+    [SerializeField] private AudioSource chargeAudio;
+
     private float _currentVelocityX;
 
     private bool _isCharging;
@@ -25,19 +29,20 @@ public class SnailController : MonoBehaviour
     private float _cooldownEndTime;
 
     private float _sprintDirection;
-    
+
     private SpriteRenderer _spriteRenderer;
     private Animator _animator;
     private bool _subscribed;
 
     void Start()
     {
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _animator = GetComponent<Animator>();
+
         if (InputManager.Instance != null)
         {
             Subscribe();
         }
-        _spriteRenderer = GetComponent<SpriteRenderer>();
-        _animator = GetComponent<Animator>();
     }
 
     void OnEnable()
@@ -54,6 +59,9 @@ public class SnailController : MonoBehaviour
         {
             Unsubscribe();
         }
+
+        StopMoveSound();
+        StopChargeSound();
     }
 
     void OnDestroy()
@@ -68,6 +76,7 @@ public class SnailController : MonoBehaviour
     {
         if (_subscribed) return;
         if (InputManager.Instance == null) return;
+
         InputManager.Instance.OnMove += OnMove;
         InputManager.Instance.OnSprint += OnSprint;
         _subscribed = true;
@@ -77,6 +86,7 @@ public class SnailController : MonoBehaviour
     {
         if (!_subscribed) return;
         if (InputManager.Instance == null) return;
+
         InputManager.Instance.OnMove -= OnMove;
         InputManager.Instance.OnSprint -= OnSprint;
         _subscribed = false;
@@ -84,8 +94,19 @@ public class SnailController : MonoBehaviour
 
     private void OnMove(Vector2 value)
     {
-        _animator.SetBool("Move", true);
         _moveInput = value;
+        _animator.SetBool("Move", Mathf.Abs(value.x) > 0.1f);
+
+        if (value.x < 0f)
+        {
+            _spriteRenderer.flipX = false;
+            _animator.Play("Snail-move");
+        }
+        else if (value.x > 0f)
+        {
+            _spriteRenderer.flipX = true;
+            _animator.Play("Snail-move");
+        }
 
         if (_charged && !_isSprinting)
         {
@@ -94,31 +115,21 @@ public class SnailController : MonoBehaviour
             else if (value.x < -0.1f)
                 StartSprint(-1f);
         }
-
-        if (value.x < 0f)
-        {
-            _spriteRenderer.flipX = false;
-            _animator.Play("Snail-move");
-        }
-        else if (value.x >= 1f)
-        {
-            _spriteRenderer.flipX = true;
-            _animator.Play("Snail-move");
-        }
-        else
-        {
-            _animator.SetBool("Move", false);
-        }
     }
 
     private void OnSprint(bool value)
     {
-        if (value && !_isCharging && !_charged && !_isSprinting && Time.time >= _cooldownEndTime)
-        {
-            _animator.SetBool("Charge", true);
-            _isCharging = true;
-            _chargeEndTime = Time.time + chargeDuration;
-        }
+        if (!value) return;
+
+        if (_isCharging || _charged || _isSprinting) return;
+        if (Time.time < _cooldownEndTime) return;
+
+        _animator.SetBool("Charge", true);
+        _isCharging = true;
+        _chargeEndTime = Time.time + chargeDuration;
+
+        PlayChargeSound();
+        StopMoveSound();
     }
 
     private void StartSprint(float direction)
@@ -135,34 +146,23 @@ public class SnailController : MonoBehaviour
         {
             _animator.SetBool("Charge", false);
             _isCharging = false;
+            StopChargeSound();
 
             if (Mathf.Abs(_moveInput.x) > 0.1f)
-            {
                 StartSprint(Mathf.Sign(_moveInput.x));
-            }
             else
-            {
                 _charged = true;
-            }
         }
-
-
+        
         if (_isSprinting && Time.time >= _sprintEndTime)
         {
             _isSprinting = false;
             _cooldownEndTime = Time.time + cooldown;
         }
-
-        float targetSpeed;
-
-        if (_isSprinting)
-        {
-            targetSpeed = _sprintDirection * sprintSpeed;
-        }
-        else
-        {
-            targetSpeed = _moveInput.x * movementSpeed;
-        }
+        
+        float targetSpeed = _isSprinting
+            ? _sprintDirection * sprintSpeed
+            : _moveInput.x * movementSpeed;
 
         _currentVelocityX = Mathf.MoveTowards(
             _currentVelocityX,
@@ -171,5 +171,44 @@ public class SnailController : MonoBehaviour
         );
 
         transform.Translate(_currentVelocityX * Time.deltaTime, 0f, 0f);
+        
+        bool isMoving = Mathf.Abs(_currentVelocityX) > 0.1f;
+
+        if (_isCharging)
+        {
+            StopMoveSound();
+        }
+        else if (isMoving)
+        {
+            PlayMoveSound();
+        }
+        else
+        {
+            StopMoveSound();
+        }
+    }
+    
+    private void PlayMoveSound()
+    {
+        if (moveAudio != null && !moveAudio.isPlaying)
+            moveAudio.Play();
+    }
+
+    private void StopMoveSound()
+    {
+        if (moveAudio != null && moveAudio.isPlaying)
+            moveAudio.Stop();
+    }
+
+    private void PlayChargeSound()
+    {
+        if (chargeAudio != null && !chargeAudio.isPlaying)
+            chargeAudio.Play();
+    }
+
+    private void StopChargeSound()
+    {
+        if (chargeAudio != null && chargeAudio.isPlaying)
+            chargeAudio.Stop();
     }
 }
