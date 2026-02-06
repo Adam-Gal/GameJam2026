@@ -9,6 +9,7 @@ public class InputManager : MonoBehaviour
     private PlayerInput _input;
     public event Action<Vector2> OnMove;
     public event Action<bool> OnSprint;
+    public event Action<bool> OnUse;
 
     private void Awake()
     {
@@ -49,6 +50,8 @@ public class InputManager : MonoBehaviour
         _input.Player.Move.canceled  += OnMoveCanceled;
         _input.Player.Sprint.performed += OnSprintPerformed;
         _input.Player.Sprint.canceled  += OnSprintCancelled;
+        _input.Player.Use.performed += OnUsePerformed;
+        _input.Player.Use.canceled += OnUseCancelled;
     }
 
     private void Unsubscribe()
@@ -57,6 +60,8 @@ public class InputManager : MonoBehaviour
         _input.Player.Move.canceled  -= OnMoveCanceled;
         _input.Player.Sprint.performed -= OnSprintPerformed;
         _input.Player.Sprint.canceled  -= OnSprintCancelled;
+        _input.Player.Use.performed -= OnUsePerformed;
+        _input.Player.Use.canceled -= OnUseCancelled;
     }
 
     private void OnMovePerformed(InputAction.CallbackContext context)
@@ -77,6 +82,16 @@ public class InputManager : MonoBehaviour
     private void OnSprintCancelled(InputAction.CallbackContext context)
     {
         OnSprint?.Invoke(false);
+    }
+    
+    private void OnUsePerformed(InputAction.CallbackContext context)
+    {
+        OnUse?.Invoke(context.ReadValueAsButton());
+    }
+
+    private void OnUseCancelled(InputAction.CallbackContext context)
+    {
+        OnUse?.Invoke(false);
     }
 
     private void OnDestroy()
