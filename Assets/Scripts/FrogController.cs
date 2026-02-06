@@ -1,7 +1,6 @@
 using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D), typeof(SpriteRenderer), typeof(Animator))]
 public class FrogController : MonoBehaviour
 {
     private Vector2 _moveInput = Vector2.zero;
@@ -59,6 +58,13 @@ public class FrogController : MonoBehaviour
     void OnDisable()
     {
         UnsubscribeInput();
+        
+        _using = false;
+        _targetRotationZ = 0f;
+        if (_rigidbody2D != null)
+        {
+            _rigidbody2D.gravityScale = 1f;
+        }
 
         if (mainCamera != null)
         {
@@ -177,7 +183,10 @@ public class FrogController : MonoBehaviour
         _using = !_using;
         transform.rotation = Quaternion.Euler(0, 0, _using ? 180f : 0f);
         _targetRotationZ = _using ? 180f : 0f;
-        _rigidbody2D.gravityScale = _using ? -1 : 1;
+        if (_rigidbody2D != null)
+        {
+            _rigidbody2D.gravityScale = _using ? -1 : 1;
+        }
 
         _nextFlipTime = Time.time + flipCooldown;
     }
@@ -235,6 +244,11 @@ public class FrogController : MonoBehaviour
 
     private void Ability()
     {
+        if (mainCamera == null)
+        {
+            return;
+        }
+
         float currentRotationZ = mainCamera.transform.rotation.eulerAngles.z;
         float newRotationZ = Mathf.LerpAngle(currentRotationZ, _targetRotationZ, rotationSpeed * Time.deltaTime);
         mainCamera.transform.rotation = Quaternion.Euler(0, 0, newRotationZ);
