@@ -144,7 +144,6 @@ public class SnailController : MonoBehaviour
     {
         if (_isCharging && Time.time >= _chargeEndTime)
         {
-            _animator.SetBool("Charge", false);
             _isCharging = false;
             StopChargeSound();
 
@@ -158,6 +157,7 @@ public class SnailController : MonoBehaviour
         {
             _isSprinting = false;
             _cooldownEndTime = Time.time + cooldown;
+            _animator.SetBool("Charge", false);
         }
         
         float targetSpeed = _isSprinting

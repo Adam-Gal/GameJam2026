@@ -3,6 +3,8 @@ using UnityEngine.InputSystem;
 
 public class CharacterManagerController : MonoBehaviour
 {
+    public static CharacterManagerController Instance { get; private set; }
+
     [Header("Characters")]
     public GameObject[] characterArray;
     public int currentCharacter = 0;
@@ -13,38 +15,27 @@ public class CharacterManagerController : MonoBehaviour
 
     private bool _subscribed;
 
+    public GameObject CurrentCharacterGameObject => characterArray[currentCharacter];
+
+    void Awake()
+    {
+        Instance = this;
+    }
+
     void Start()
     {
         SetActiveCharacter(currentCharacter);
         Subscribe();
     }
 
-    void OnEnable()
-    {
-        Subscribe();
-    }
-
-    void OnDisable()
-    {
-        Unsubscribe();
-    }
-
-    void OnDestroy()
-    {
-        Unsubscribe();
-    }
+    void OnEnable() => Subscribe();
+    void OnDisable() => Unsubscribe();
+    void OnDestroy() => Unsubscribe();
 
     private void Subscribe()
     {
-        if (_subscribed)
-        {
-            return;
-        }
+        if (_subscribed || InputManager.Instance == null) return;
 
-        if (InputManager.Instance == null)
-        {
-            return;
-        }
         InputManager.Instance.OnOne += HandleOne;
         InputManager.Instance.OnTwo += HandleTwo;
         InputManager.Instance.OnThree += HandleThree;
@@ -53,10 +44,8 @@ public class CharacterManagerController : MonoBehaviour
 
     private void Unsubscribe()
     {
-        if (!_subscribed)
-        {
-            return;
-        }
+        if (!_subscribed) return;
+
         if (InputManager.Instance != null)
         {
             InputManager.Instance.OnOne -= HandleOne;
@@ -68,48 +57,28 @@ public class CharacterManagerController : MonoBehaviour
 
     private void HandleOne(bool pressed)
     {
-        if (!pressed)
-        {
-            return;
-        }
-
-        if (unlockedCharacters >= 1)
-        {
+        if (pressed && unlockedCharacters >= 1)
             SwitchCharacter(0);
-        }
     }
 
     private void HandleTwo(bool pressed)
     {
-        if (!pressed)
-        {
-            return;
-        }
-
-        if (unlockedCharacters >= 2)
-        {
+        if (pressed && unlockedCharacters >= 2)
             SwitchCharacter(1);
-        }
     }
 
     private void HandleThree(bool pressed)
     {
-        if (!pressed)
-        {
-            return;
-        }
-
-        if (unlockedCharacters >= 3)
-        {
+        if (pressed && unlockedCharacters >= 3)
             SwitchCharacter(2);
-        }
     }
 
     void Update()
     {
         if (Keyboard.current.tabKey.wasPressedThisFrame)
         {
-            SwitchCharacter((currentCharacter + 1) % characterArray.Length);
+            int nextIndex = (currentCharacter + 1) % characterArray.Length;
+            SwitchCharacter(nextIndex);
         }
     }
 
@@ -120,58 +89,61 @@ public class CharacterManagerController : MonoBehaviour
 
         GameObject oldChar = characterArray[currentCharacter];
         GameObject newChar = characterArray[newIndex];
-
         if (!oldChar || !newChar) return;
 
         Vector3 savedPos = oldChar.transform.position;
-        Quaternion savedRot = Quaternion.identity;
+        Quaternion savedRot = oldChar.transform.rotation;
 
-        Rigidbody oldRb = oldChar.GetComponent<Rigidbody>();
-        if (oldRb)
+        // deaktivuje starý charakter a jeho Rigidbody
+        Rigidbody2D oldRb2D = oldChar.GetComponent<Rigidbody2D>();
+        if (oldRb2D != null)
         {
-            oldRb.linearVelocity = Vector3.zero;
-            oldRb.angularVelocity = Vector3.zero;
-            oldRb.isKinematic = true;
+            oldRb2D.linearVelocity = Vector2.zero;
+            oldRb2D.angularVelocity = 0f;
+            oldRb2D.isKinematic = true;
         }
 
         oldChar.SetActive(false);
 
+        // aktivuje nový charakter
         newChar.transform.SetPositionAndRotation(savedPos, savedRot);
         newChar.SetActive(true);
 
-        Rigidbody newRb = newChar.GetComponent<Rigidbody>();
-        if (newRb)
+        Rigidbody2D newRb2D = newChar.GetComponent<Rigidbody2D>();
+        if (newRb2D != null)
         {
-            newRb.isKinematic = false;
-            newRb.linearVelocity = Vector3.zero;
-            newRb.angularVelocity = Vector3.zero;
+            newRb2D.isKinematic = false;
+            newRb2D.linearVelocity = Vector2.zero;
+            newRb2D.angularVelocity = 0f;
         }
 
-        if (cameraFollower)
-            cameraFollower.SetTarget(newChar.transform, true);
+        cameraFollower?.SetTarget(newChar.transform, true);
 
         currentCharacter = newIndex;
     }
 
-
     private void SetActiveCharacter(int index)
     {
+        // deaktivuje všetky charaktery
         for (int i = 0; i < characterArray.Length; i++)
         {
             if (characterArray[i])
             {
+                Rigidbody2D rb2D = characterArray[i].GetComponent<Rigidbody2D>();
+                if (rb2D) rb2D.isKinematic = true;
                 characterArray[i].SetActive(false);
             }
         }
 
-        if (characterArray[index])
+        // aktivuje len aktuálny
+        GameObject activeChar = characterArray[index];
+        if (activeChar)
         {
-            characterArray[index].SetActive(true);
+            activeChar.SetActive(true);
+            Rigidbody2D rb2D = activeChar.GetComponent<Rigidbody2D>();
+            if (rb2D) rb2D.isKinematic = false;
 
-            if (cameraFollower)
-            {
-                cameraFollower.SetTarget(characterArray[index].transform, true);
-            }
+            cameraFollower?.SetTarget(activeChar.transform, true);
         }
 
         currentCharacter = index;
