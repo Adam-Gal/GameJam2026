@@ -1,0 +1,17 @@
+using UnityEngine;
+
+public class CameraFollower : MonoBehaviour
+{
+    public Transform target;
+    private Vector3 _offset;
+
+    void Start()
+    {
+        _offset = transform.position - target.position;
+    }
+
+    void Update()
+    {
+        transform.position = target.position + _offset;
+    }
+}
