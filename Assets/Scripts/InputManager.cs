@@ -46,6 +46,8 @@ public class InputManager : MonoBehaviour
 
     private void Subscribe()
     {
+        if (_input == null) return;
+        
         _input.Player.Move.performed += OnMovePerformed;
         _input.Player.Move.canceled  += OnMoveCanceled;
         _input.Player.Sprint.performed += OnSprintPerformed;
@@ -56,6 +58,8 @@ public class InputManager : MonoBehaviour
 
     private void Unsubscribe()
     {
+        if (_input == null) return;
+        
         _input.Player.Move.performed -= OnMovePerformed;
         _input.Player.Move.canceled  -= OnMoveCanceled;
         _input.Player.Sprint.performed -= OnSprintPerformed;
