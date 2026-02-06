@@ -61,11 +61,11 @@ public class FishController : MonoBehaviour
         
         if (value.x < 0f)
         {
-            _spriteRenderer.flipX = true;
+            _spriteRenderer.flipX = false;
         }
         else if (value.x >= 1f)
         {
-            _spriteRenderer.flipX = false;
+            _spriteRenderer.flipX = true;
         }
     }
 
