@@ -136,7 +136,7 @@ MonoBehaviour:
   flipCooldown: 2
   moveDuration: 0.25
   waitDuration: 0.25
-  soundPauseTime: 2
+  soundPauseTime: 5
 --- !u!50 &-7767791991783173176
 Rigidbody2D:
   serializedVersion: 5

@@ -27,7 +27,7 @@ public class FrogController : MonoBehaviour
     [SerializeField] private float waitDuration = 0.65f;
     
     [Header("Frog Audio")]
-    [SerializeField] private float soundPauseTime = 2f;
+    [SerializeField] private float soundPauseTime = 5f;
 
     private AudioSource _frogAudio;
     private Coroutine _frogSoundCoroutine;
