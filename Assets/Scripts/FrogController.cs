@@ -7,7 +7,6 @@ public class FrogController : MonoBehaviour
 
     [Header("Movement")]
     [SerializeField] private float movementSpeed = 1f;
-    [SerializeField] private float acceleration = 25f;
     [SerializeField] private float rotationSpeed = 5f;
 
     private float _currentVelocityX;
@@ -25,10 +24,6 @@ public class FrogController : MonoBehaviour
     [Header("Side Movement Timing")]
     [SerializeField] private float moveDuration = 0.25f;
     [SerializeField] private float waitDuration = 0.65f;
-
-    [Header("Post-Input Wait")]
-    [SerializeField] private float postInputWait = 0.65f;
-    private float _postInputTimer = 0f;
 
     private float _sideTimer;
     private float _hopLockTimer;
