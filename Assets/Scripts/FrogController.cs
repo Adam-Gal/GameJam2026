@@ -79,7 +79,7 @@ public class FrogController : MonoBehaviour
         }
         else if (value.x >= 1f)
         {
-            _spriteRenderer.flipX = true;
+            _spriteRenderer.flipX = false;
         }
         else
         {

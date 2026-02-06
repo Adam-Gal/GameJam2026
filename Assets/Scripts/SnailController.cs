@@ -85,7 +85,7 @@ public class SnailController : MonoBehaviour
         }
         else if (value.x >= 1f)
         {
-            _spriteRenderer.flipX = true;
+            _spriteRenderer.flipX = false;
             _animator.Play("Snail-move");
         }
         else
