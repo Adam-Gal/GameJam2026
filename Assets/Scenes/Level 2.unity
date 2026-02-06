@@ -15324,6 +15324,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: frog
       objectReference: {fileID: 0}
+    - target: {fileID: 9009816171007968044, guid: 20a2f8d2876e1cd46b362de36d94e56a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
