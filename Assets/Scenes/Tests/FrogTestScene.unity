@@ -300,7 +300,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FrogController
   movementSpeed: 5
   acceleration: 25
+  rotationSpeed: 5
   mainCamera: {fileID: 519420031}
+  flipCooldown: 2
+  moveDuration: 0.25
+  waitDuration: 0.75
+  postInputWait: 0.25
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -815,6 +820,7 @@ MonoBehaviour:
   movementSpeed: 1
   sprintSpeed: 10
   acceleration: 25
+  chargeDuration: 1
   sprintDuration: 0.5
   cooldown: 10
 --- !u!50 &1260154930

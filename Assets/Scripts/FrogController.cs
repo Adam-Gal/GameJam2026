@@ -14,13 +14,29 @@ public class FrogController : MonoBehaviour
     public Camera mainCamera;
     private bool _using;
     private Rigidbody2D _rigidbody2D;
-    private BoxCollider2D _boxCollider2D;
     private bool _onGround;
 
     private float _targetRotationZ;
+
     [Header("Flip Cooldown")]
     [SerializeField] private float flipCooldown = 2f;
-    private float _nextFlipTime = 0f;
+    private float _nextFlipTime;
+
+    [Header("Side Movement Timing")]
+    [SerializeField] private float moveDuration = 0.25f;
+    [SerializeField] private float waitDuration = 0.65f;
+
+    [Header("Post-Input Wait")]
+    [SerializeField] private float postInputWait = 0.65f;
+    private float _postInputTimer = 0f;
+
+    private float _sideTimer;
+    private float _hopLockTimer;
+    private float _nextHopAllowedTime;
+    private bool _isSideMoving;
+    private bool _hadSideInput;
+
+
 
     void Start()
     {
@@ -53,6 +69,7 @@ public class FrogController : MonoBehaviour
     private void OnMove(Vector2 value)
     {
         _moveInput = value;
+
     }
 
     private void OnUse(bool value)
@@ -60,11 +77,11 @@ public class FrogController : MonoBehaviour
         if (value && Time.time >= _nextFlipTime)
         {
             _using = !_using;
-            
+
             transform.rotation = Quaternion.Euler(0, 0, _using ? 180f : 0f);
             _targetRotationZ = _using ? 180f : 0f;
             _rigidbody2D.gravityScale = _using ? -1 : 1;
-            
+
             _nextFlipTime = Time.time + flipCooldown;
         }
     }
@@ -72,13 +89,61 @@ public class FrogController : MonoBehaviour
     private void Movement()
     {
         if (!_onGround)
+            return;
+
+        bool hasSideInput = Mathf.Abs(_moveInput.x) > 0.1f;
+
+        // No input → stop everything
+        if (!hasSideInput)
         {
+            _currentVelocityX = 0f;
+            _sideTimer = 0f;
+            _isSideMoving = false;
+            _hadSideInput = false;
             return;
         }
-        
-        float targetSpeed = _moveInput.x * movementSpeed;
-        _currentVelocityX = Mathf.MoveTowards(_currentVelocityX, targetSpeed, acceleration * Time.deltaTime);
-        transform.Translate(_currentVelocityX * Time.deltaTime, 0f, 0f);
+
+        // Start hop cycle immediately on first press (but not spammable)
+        if (!_hadSideInput && Time.time >= _nextHopAllowedTime)
+        {
+            _isSideMoving = true;
+            _sideTimer = 0f;
+            _hadSideInput = true;
+
+            // Prevent tap-spamming from restarting the cycle
+            _nextHopAllowedTime = Time.time + moveDuration + waitDuration;
+        }
+
+        // If cycle hasn't started yet, do nothing
+        if (!_hadSideInput)
+            return;
+
+        _sideTimer += Time.deltaTime;
+
+        if (_isSideMoving)
+        {
+            // MOVE phase
+            if (_sideTimer >= moveDuration)
+            {
+                _sideTimer = 0f;
+                _isSideMoving = false;
+                _currentVelocityX = 0f;
+            }
+            else
+            {
+                _currentVelocityX = Mathf.Sign(_moveInput.x) * movementSpeed;
+                transform.Translate(_currentVelocityX * Time.deltaTime, 0f, 0f);
+            }
+        }
+        else
+        {
+            // WAIT phase
+            if (_sideTimer >= waitDuration)
+            {
+                _sideTimer = 0f;
+                _isSideMoving = true; // 🔁 loop hop
+            }
+        }
     }
 
     private void Ability()
