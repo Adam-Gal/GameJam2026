@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class FrogController : MonoBehaviour
@@ -24,6 +25,12 @@ public class FrogController : MonoBehaviour
     [Header("Side Movement Timing")]
     [SerializeField] private float moveDuration = 0.25f;
     [SerializeField] private float waitDuration = 0.65f;
+    
+    [Header("Audio")]
+    [SerializeField] private float soundPauseTime = 2f;
+
+    private AudioSource _frogAudio;
+    private Coroutine _soundCoroutine;
 
     private float _sideTimer;
     private float _hopLockTimer;
@@ -38,6 +45,7 @@ public class FrogController : MonoBehaviour
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _animator = GetComponent<Animator>();
+        _frogAudio = GetComponent<AudioSource>();
     }
 
     void Start()
@@ -49,11 +57,25 @@ public class FrogController : MonoBehaviour
     void OnEnable()
     {
         if (InputManager.Instance != null) Subscribe();
+        
+        if (_frogAudio != null && _soundCoroutine == null)
+        {
+            _soundCoroutine = StartCoroutine(FrogSoundLoop());
+        }
     }
 
     void OnDisable()
     {
         if (InputManager.Instance != null) Unsubscribe();
+        
+        if (_soundCoroutine != null)
+        {
+            StopCoroutine(_soundCoroutine);
+            _soundCoroutine = null;
+        }
+
+        if (_frogAudio.isPlaying)
+            _frogAudio.Stop();
     }
 
     private void Subscribe()
@@ -183,4 +205,15 @@ public class FrogController : MonoBehaviour
     {
         _onGround = false;
     }
+    
+    private IEnumerator FrogSoundLoop()
+    {
+        while (true)
+        {
+            _frogAudio.Play();
+            yield return new WaitForSeconds(_frogAudio.clip.length);
+            yield return new WaitForSeconds(soundPauseTime);
+        }
+    }
+
 }
