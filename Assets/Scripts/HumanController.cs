@@ -14,11 +14,13 @@ public class HumanController : MonoBehaviour
     private float _currentVelocityX;
     private SpriteRenderer _spriteRenderer;
     private Animator _animator;
+    private AudioSource _footstepAudio;
 
     private void Awake()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _animator = GetComponent<Animator>();
+        _footstepAudio = GetComponent<AudioSource>();
     }
 
     void Start()
@@ -79,5 +81,16 @@ public class HumanController : MonoBehaviour
         float targetSpeed = _moveInput.x * movementSpeed;
         _currentVelocityX = Mathf.MoveTowards(_currentVelocityX, targetSpeed, acceleration * Time.deltaTime);
         transform.Translate(_currentVelocityX * Time.deltaTime, 0f, 0f);
+        
+        if (Mathf.Abs(_currentVelocityX) > 0.1f)
+        {
+            if (!_footstepAudio.isPlaying)
+                _footstepAudio.Play();
+        }
+        else
+        {
+            if (_footstepAudio.isPlaying)
+                _footstepAudio.Stop();
+        }
     }
 }
