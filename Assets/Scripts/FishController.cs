@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class FishController : MonoBehaviour
 {
@@ -133,6 +134,22 @@ public class FishController : MonoBehaviour
             _fishAudio.Play();
             yield return new WaitForSeconds(_fishAudio.clip.length);
             yield return new WaitForSeconds(soundPauseTime);
+        }
+    }
+    
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("End1"))
+        {
+            SceneManager.LoadScene("List 2");
+        }
+        if (other.gameObject.CompareTag("End2"))
+        {
+            SceneManager.LoadScene("List 3");
+        }
+        if (other.gameObject.CompareTag("End3"))
+        {
+            SceneManager.LoadScene("List 4");
         }
     }
 }

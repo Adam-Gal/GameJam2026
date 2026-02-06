@@ -77,6 +77,8 @@ public class InputManager : MonoBehaviour
         _input.Player.Two.canceled += OnTwoCancelled;
         _input.Player.Three.performed += OnThreePerformed;
         _input.Player.Three.canceled += OnThreeCancelled;
+        _input.Player.Escape.performed += OnEscapePerformed;
+        _input.Player.Escape.canceled += OnEscapeCancelled;
     }
 
     private void Unsubscribe()
@@ -98,6 +100,8 @@ public class InputManager : MonoBehaviour
         _input.Player.Two.canceled -= OnTwoCancelled;
         _input.Player.Three.performed -= OnThreePerformed;
         _input.Player.Three.canceled -= OnThreeCancelled;
+        _input.Player.Escape.performed -= OnEscapePerformed;
+        _input.Player.Escape.canceled -= OnEscapeCancelled;
     }
 
     private void OnMovePerformed(InputAction.CallbackContext context)
@@ -159,6 +163,16 @@ public class InputManager : MonoBehaviour
     {
         OnThree?.Invoke(false);
     }
+    
+    private void OnEscapePerformed(InputAction.CallbackContext context)
+    {
+        Application.Quit();
+    }
+
+    private void OnEscapeCancelled(InputAction.CallbackContext context)
+    {
+    }
+    
 
     private void OnDestroy()
     {

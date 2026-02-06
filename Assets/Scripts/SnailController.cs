@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SnailController : MonoBehaviour
 {
@@ -210,5 +211,21 @@ public class SnailController : MonoBehaviour
     {
         if (chargeAudio != null && chargeAudio.isPlaying)
             chargeAudio.Stop();
+    }
+    
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("End1"))
+        {
+            SceneManager.LoadScene("List 2");
+        }
+        if (other.gameObject.CompareTag("End2"))
+        {
+            SceneManager.LoadScene("List 3");
+        }
+        if (other.gameObject.CompareTag("End3"))
+        {
+            SceneManager.LoadScene("List 4");
+        }
     }
 }
