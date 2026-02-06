@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -28,6 +29,10 @@ public class PlayerController : MonoBehaviour
         {
             collectibleCount++;
             Destroy(other.gameObject);
+        }
+        if (other.gameObject.CompareTag("Bed"))
+        {
+            SceneManager.LoadScene("List 1");
         }
     }
 }
