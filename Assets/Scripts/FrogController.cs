@@ -68,6 +68,10 @@ public class FrogController : MonoBehaviour
         {
             Unsubscribe();
         }
+        
+        mainCamera.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+        transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+
         if (_frogSoundCoroutine != null)
         {
             StopCoroutine(_frogSoundCoroutine);
@@ -204,6 +208,7 @@ public class FrogController : MonoBehaviour
         float newRotationZ = Mathf.LerpAngle(currentRotationZ, _targetRotationZ, rotationSpeed * Time.deltaTime);
         mainCamera.transform.rotation = Quaternion.Euler(0, 0, newRotationZ);
     }
+    
 
     void Update()
     {
