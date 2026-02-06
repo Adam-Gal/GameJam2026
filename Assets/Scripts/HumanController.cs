@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class HumanController : MonoBehaviour
@@ -11,7 +12,15 @@ public class HumanController : MonoBehaviour
     private float acceleration = 25f;
 
     private float _currentVelocityX;
-    
+    private SpriteRenderer _spriteRenderer;
+    private Animator _animator;
+
+    private void Awake()
+    {
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _animator = GetComponent<Animator>();
+    }
+
     void Start()
     {
         if (InputManager.Instance != null)
@@ -48,7 +57,21 @@ public class HumanController : MonoBehaviour
 
     private void OnMove(Vector2 value)
     {
+        _animator.SetBool("isWalking", true);
         _moveInput = value;
+        
+        if (value.x < 0f)
+        {
+            _spriteRenderer.flipX = true;
+        }
+        else if (value.x >= 1f)
+        {
+            _spriteRenderer.flipX = false;
+        }
+        else
+        {
+            _animator.SetBool("isWalking", false);
+        }
     }
 
     void Update()

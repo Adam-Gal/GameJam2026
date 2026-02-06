@@ -12,6 +12,9 @@ public class FishController : MonoBehaviour
 
     private float _currentVelocityX;
     
+    private SpriteRenderer _spriteRenderer;
+    private Animator _animator;
+    
     void Start()
     {
         if (InputManager.Instance != null)
@@ -49,6 +52,15 @@ public class FishController : MonoBehaviour
     private void OnMove(Vector2 value)
     {
         _moveInput = value;
+        
+        if (value.x < 0f)
+        {
+            _spriteRenderer.flipX = true;
+        }
+        else if (value.x >= 1f)
+        {
+            _spriteRenderer.flipX = true;
+        }
     }
 
     void Update()

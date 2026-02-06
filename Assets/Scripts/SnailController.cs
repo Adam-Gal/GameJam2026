@@ -25,6 +25,9 @@ public class SnailController : MonoBehaviour
     private float _cooldownEndTime;
 
     private float _sprintDirection;
+    
+    private SpriteRenderer _spriteRenderer;
+    private Animator _animator;
 
     void Start()
     {
@@ -58,6 +61,7 @@ public class SnailController : MonoBehaviour
 
     private void OnMove(Vector2 value)
     {
+        _animator.SetBool("Move", true);
         _moveInput = value;
 
         if (_charged && !_isSprinting)
@@ -67,12 +71,28 @@ public class SnailController : MonoBehaviour
             else if (value.x < -0.1f)
                 StartSprint(-1f);
         }
+
+        if (value.x < 0f)
+        {
+            _spriteRenderer.flipX = true;
+            _animator.Play("Snail-move");
+        }
+        else if (value.x >= 1f)
+        {
+            _spriteRenderer.flipX = true;
+            _animator.Play("Snail-move");
+        }
+        else
+        {
+            _animator.SetBool("Move", false);
+        }
     }
 
     private void OnSprint(bool value)
     {
         if (value && !_isCharging && !_charged && !_isSprinting && Time.time >= _cooldownEndTime)
         {
+            _animator.SetBool("Charge", true);
             _isCharging = true;
             _chargeEndTime = Time.time + chargeDuration;
         }
@@ -90,6 +110,7 @@ public class SnailController : MonoBehaviour
     {
         if (_isCharging && Time.time >= _chargeEndTime)
         {
+            _animator.SetBool("Charge", false);
             _isCharging = false;
 
             if (Mathf.Abs(_moveInput.x) > 0.1f)

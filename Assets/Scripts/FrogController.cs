@@ -30,7 +30,9 @@ public class FrogController : MonoBehaviour
     private float _nextHopAllowedTime;
     private bool _isSideMoving;
     private bool _hadSideInput;
-
+    
+    private SpriteRenderer _spriteRenderer;
+    private Animator _animator;
 
 
     void Start()
@@ -63,8 +65,21 @@ public class FrogController : MonoBehaviour
 
     private void OnMove(Vector2 value)
     {
+        _animator.SetBool("Move", true);
         _moveInput = value;
-
+        
+        if (value.x < 0f)
+        {
+            _spriteRenderer.flipX = true;
+        }
+        else if (value.x >= 1f)
+        {
+            _spriteRenderer.flipX = true;
+        }
+        else
+        {
+            _animator.SetBool("Move", false);
+        }
     }
 
     private void OnUse(bool value)
