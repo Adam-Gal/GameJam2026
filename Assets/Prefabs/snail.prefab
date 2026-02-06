@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5894471788076689283}
   - component: {fileID: 8652543037977346006}
   - component: {fileID: 9037495719637360936}
+  - component: {fileID: 1792890860072637942}
   - component: {fileID: 3802527671088268804}
   - component: {fileID: 8598910497289224095}
   - component: {fileID: 7250267536176749710}
@@ -18,7 +19,7 @@ GameObject:
   - component: {fileID: 8181887702369750417}
   m_Layer: 0
   m_Name: snail
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -120,6 +121,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1792890860072637942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 437580774952708907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b51875c73f7a2b48aba31554fa471c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
 --- !u!114 &3802527671088268804
 MonoBehaviour:
   m_ObjectHideFlags: 0
